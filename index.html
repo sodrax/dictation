@@ -234,6 +234,7 @@
                     str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name)
                 }
             }
+            alert(str);
             document.getElementById("ddlVoice").innerHTML = str;
             document.getElementById("ddlVoice").value = data.voice.value;   
         } catch (e){
