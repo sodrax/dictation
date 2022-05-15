@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <title>Dictation!</title>
+
+    <style>
+        .material-icons {
+            vertical-align: middle;
+            line-height: 0 !important;
+            position: relative;
+            top: -1px;
+        }
+
+        .hidden-text {
+            text-shadow: 0 0 20px black;
+            color: transparent;
+        }
+
+        .btn-100px {
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body onload="load()">
+    <nav class="navbar navbar-dark bg-dark navbar-expand-sm">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
+                aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#">Dictation!</a>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                </ul>
+                <form class="d-flex">
+
+                    <button class="btn btn-outline-success ms-2 btn-100px" type="button"
+                        onclick="show('setting');">Settings</button>
+                    <button class="btn btn-outline-warning ms-2 btn-100px" type="button"
+                        onclick="show('play');">Play</button>
+                    <button class="btn btn-outline-danger ms-2 btn-100px" type="button"
+                        onclick="show('result');">Result</button>
+                </form>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pt-3">
+        <section id="sectionSettings">
+
+            <h2>Settings</h2>
+
+            <h3 class="w-100 border-bottom">Audio</h3>
+            <div class="mb-3">
+                <label for="ddlVoice" class="form-label">Voices</label>
+                <select class="form-control" id="ddlVoice"></select>
+            </div>
+
+            <div class="mb-3">
+                <label for="rngRate" class="form-label">Rate</label>
+                <input type="range" class="form-range" min="0" max="10" id="rngRate">
+            </div>
+
+            <div class="mb-4">
+                <label for="rngPitch" class="form-label">Pitch</label>
+                <input type="range" class="form-range" min="0" max="10" id="rngPitch">
+            </div>
+
+
+            <h3 class="w-100 border-bottom">Words</h3>
+            <div class="mb-3">
+                <label for="txtWords" class="form-label">Separated by commas (,)</label>
+                <textarea class="form-control" id="txtWords" placeholder="colors,animals,house" rows="3"></textarea>
+            </div>
+
+            <h3 class="w-100 border-bottom">Game</h3>
+            <div class="mb-3">
+                <label for="txtWords" class="form-label">Time [ms]</label>
+                <input type="number" class="form-control" id="txtTime" step="100"></input>
+            </div>
+            <div class="mb-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="swtTeacher">
+                    <label class="form-check-label" for="swtTeacher">Teacher mode</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button type="button" class="btn btn-secondary btn-100px" onclick="loadSetting()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-100px" onclick="saveSetting()">Save</button>
+            </div>
+
+
+        </section>
+
+        <section id="sectionPlay" class="d-none">
+            <div class="d-flex justify-content-between">
+                <h2>Play&nbsp; <span class="badge rounded-pill bg-primary" id="bgPosition" ></span></h2>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button id="btnReset" type="button" class="btn btn-outline-success" onclick="reset()">
+                        <span class="material-icons">
+                            restart_alt
+                        </span>
+                    </button>
+                    <button id="btnPause" type="button" class="btn btn-outline-success" onclick="pause()">
+                        <span class="material-icons">
+                            pause
+                        </span></button>
+                    <button id="btnPlay" type="button" class="btn btn-outline-success" onclick="play()">
+                        <span class="material-icons">
+                            play_arrow
+                        </span></button>
+                </div>
+            </div>
+
+            <div class="w-100 text-center align-middle mt-5">
+                <span id="currentWord" class="fs-2"></span>
+            </div>
+
+            <div class="btn-group mx-auto w-100" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-primary" onclick="previous()">
+                    <span class="material-icons">
+                        arrow_back_ios_new
+                    </span>
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="replay(true)">
+                    <span class="material-icons">
+                        replay
+                    </span></button>
+                <button type="button" class="btn btn-outline-primary" onclick="next()">
+                    <span class="material-icons">
+                        arrow_forward_ios
+                    </span></button>
+            </div>
+        </section>
+
+        <section id="sectionResults" class="d-none">
+            <h2>Results</h2>
+            <div class="list-group" id="divWords"></div>
+        </section>
+    </div>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+</body>
+<script>
+    var voices = [];
+    var iteratedPositions = [];
+    var currentPosition = -1;
+    var interval = -1;
+    var data = localStorage.getItem('dictation') ?
+        JSON.parse(localStorage.getItem('dictation')) :
+        {
+            "voice": {
+                "value": 49,
+                "rate": 10,
+                "pitch": 8,
+            },
+            "words": ['boot', 'coat', 'dress', 'hat', 'jacket', 'jeans', 'scarf', 'shirt', 'shoe', 'shorts', 'skirt', 'sock', 'sweater', 'swimsuit', 'trousers', 't-shirt', 'bag', 'glasses', 'clothes', 'things'],
+            "game": {
+                "time": 3000,
+                "teacher": false
+            }
+
+        };
+
+    function show(section) {
+        addClass("sectionSettings", "d-none");
+        addClass("sectionPlay", "d-none");
+        addClass("sectionResults", "d-none");
+        switch (section) {
+            case "play":
+                removeClass("sectionPlay", "d-none");
+                break;
+            case "result":
+                removeClass("sectionResults", "d-none");
+                loadResult();
+                break;
+            default:
+                removeClass("sectionSettings", "d-none");
+                break;
+        }
+    }
+
+
+
+    function load() {
+        loadVoices();
+        loadSetting();
+        loadWords();
+        reset();
+    }
+
+    function loadVoices() {
+        window.speechSynthesis.onvoiceschanged = () => {
+            voices = window.speechSynthesis.getVoices();
+            var option = "<option value='{{i}}'>{{text}}</option>";
+            var str = "";
+            for (let index = 0; index < voices.length; index++) {
+                const voice = voices[index];
+                if (voice.lang == "en-US") {
+                    str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name);
+                }
+            }
+            document.getElementById("ddlVoice").innerHTML = str;
+            document.getElementById("ddlVoice").value = data.voice.value;
+            window.speechSynthesis.onvoiceschanged = null;
+        }
+    }
+
+    function loadSetting() {
+        document.getElementById("ddlVoice").value = data.voice.value;
+        document.getElementById("rngRate").value = data.voice.rate;
+        document.getElementById("rngPitch").value = data.voice.pitch;
+        document.getElementById("txtWords").value = data.words.join(', ');
+        document.getElementById("txtTime").value = data.game.time;
+        document.getElementById("swtTeacher").checked = data.game.teacher;
+
+    }
+
+    function saveSetting() {
+        data.voice.value = document.getElementById("ddlVoice").value;
+        data.voice.rate = document.getElementById("rngRate").value;
+        data.voice.pitch = document.getElementById("rngPitch").value;
+        data.game.teacher = document.getElementById("swtTeacher").checked;
+        data.words = document.getElementById("txtWords").value.split(',').map(word => word.trim());
+        data.game.time = document.getElementById("txtTime").value;
+        localStorage.setItem('dictation', JSON.stringify(data));
+    }
+
+    function loadWords() {
+        if (data && data.words) {
+            document.getElementById("txtWords").value = data.words.join(', ');
+            setRandomPositions();
+        }
+    }
+
+
+    function reset() {
+        document.getElementById("currentWord").innerHTML = "";
+        document.getElementById("bgPosition").innerHTML = "";
+        iteratedPositions = [];
+        currentPosition = -1;
+        setRandomPositions();
+        pause();
+    }
+
+    function pause() {
+        clearInterval(interval);
+        addClass("btnPause", "active")
+        removeClass("btnPlay", "active")
+        interval = -1;
+    }
+
+    function play() {
+        if (interval === -1) {
+            if (currentPosition < 0) {
+                currentPosition = 0;
+            } else {
+                currentPosition += 1;
+            }
+            replay(false);
+            interval = setInterval(next, data.game.time);
+            removeClass("btnPause", "active");
+            addClass("btnPlay", "active");
+        }
+    }
+
+    function setRandomPositions() {
+        iteratedPositions = [];
+        while (iteratedPositions.length < data.words.length) {
+            const position = randomIntFromInterval(0, data.words.length - 1);
+            if (iteratedPositions.indexOf(position) === -1) {
+                iteratedPositions.push(position);
+            }
+        }
+    }
+
+    function resetInterval() {
+        if (interval === -1) {
+            return;
+        }
+        clearInterval(interval);
+        interval = setInterval(next, data.game.time);
+    }
+
+    function previous() {
+        if (currentPosition === 0) {
+            return;
+        }
+        currentPosition -= 1;
+        replay(true);
+    }
+
+    function replay(reset) {
+        const word = data.words[iteratedPositions[currentPosition]];
+        if (word) {
+            document.getElementById("currentWord").innerHTML = word;
+            document.getElementById("bgPosition").innerHTML = `${currentPosition+1}/${data.words.length}`;
+            if (data.game.teacher) {
+                removeClass("currentWord", "hidden-text");
+            }
+            else {
+                addClass("currentWord", "hidden-text");
+            }
+             
+            say(word);
+            if (reset) {
+                resetInterval();
+            }
+        }
+    }
+
+    function next() {
+        if (currentPosition === data.words.length - 1) {
+            return;
+        }
+        currentPosition += 1;
+        replay(true);
+    }
+
+    function loadResult() {
+        document.getElementById("divWords").innerHTML = "";
+        var row = `<button type="button" class="list-group-item list-group-item-action" onclick="say('{{word}}')">{{word}}</button>`;
+        var str = "";
+        iteratedPositions.forEach(i => {
+            str += row.replace(/{{word}}/ig, data.words[i])
+        });
+        document.getElementById("divWords").innerHTML = str;
+    }
+
+    function randomIntFromInterval(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min)
+    }
+
+    function say(m) {
+        if (m) {
+            //https://stackoverflow.com/questions/15653145/using-google-text-to-speech-in-javascript
+            var msg = new SpeechSynthesisUtterance();
+
+            msg.voice = voices[data.voice.value];
+            msg.voiceURI = voices[data.voice.value].voiceURI;
+            msg.name = voices[data.voice.value].name;
+            msg.volume = 1;
+            msg.rate = data.voice.rate / 10;
+            msg.pitch = data.voice.pitch / 10;
+            msg.lang = voices[data.voice.value].lang;
+            msg.text = m;
+
+            window.speechSynthesis.speak(msg);
+
+            // var msg = new SpeechSynthesisUtterance();
+            // var voices = window.speechSynthesis.getVoices();
+            // msg.voice = voices[10];
+            // msg.voiceURI = "native";
+            // msg.volume = 1;
+            // msg.rate = 1;
+            // msg.pitch = 0.8;
+            // msg.text = m;
+            // msg.lang = 'en-US';
+            // speechSynthesis.speak(msg);
+        }
+    }
+
+    function hasClass(el, className) {
+        el = typeof (el) === 'string' ? document.getElementById(el) : el;
+        if (el.classList)
+            return el.classList.contains(className);
+        return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+    }
+
+    function addClass(el, className) {
+        el = typeof (el) === 'string' ? document.getElementById(el) : el;
+        if (el.classList)
+            el.classList.add(className)
+        else if (!hasClass(el, className))
+            el.className += " " + className;
+    }
+
+    function removeClass(el, className) {
+        el = typeof (el) === 'string' ? document.getElementById(el) : el;
+        if (el.classList)
+            el.classList.remove(className)
+        else if (hasClass(el, className)) {
+            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+            el.className = el.className.replace(reg, ' ');
+        }
+    }
+</script>
+
+</html>
