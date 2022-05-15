@@ -229,10 +229,11 @@
             var str = "";
             for (let index = 0; index < voices.length; index++) {
                 const voice = voices[index];
-                if (voice.lang == "en-US") {
+                str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "["+ voice.lang+"]")
+                // if (voice.lang == "en-US") {
                     
-                    str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name)
-                }
+                //     str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "["+ voice.lang+"]")
+                // }
             }
             alert(str);
             document.getElementById("ddlVoice").innerHTML = str;
