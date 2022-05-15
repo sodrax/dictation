@@ -219,14 +219,12 @@
         voices = window.speechSynthesis.getVoices();
 
         if (voices.length > 0) {
-
-
             var option = "<option value='{{i}}'>{{text}}</option>";
             var str = "";
             for (let index = 0; index < voices.length; index++) {
                 const voice = voices[index];
-                if (voice.lang.toLowerCase().startsWith("en")) {
-                    str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "[" + voice.lang + "]")
+                if (voice.lang == "en-US" || voice.lang == "en_US") {
+                    str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + " [" + voice.lang + "]")
                 }
             }
             document.getElementById("ddlVoice").innerHTML = str;
