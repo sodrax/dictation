@@ -12,7 +12,7 @@
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <title>Dictation!</title>
+    <title>Dictation! v1.0</title>
 
     <style>
         .material-icons {
@@ -167,6 +167,9 @@
     -->
 </body>
 <script>
+    window.onerror = function(error, url, line) {
+        alert(`ERR:${error} URL:${url} L:${line}`);
+    };
     var voices = [];
     var iteratedPositions = [];
     var currentPosition = -1;
@@ -410,6 +413,9 @@
     }
 
     load();
+
+
+
 </script>
 
 </html>
