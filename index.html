@@ -108,7 +108,7 @@
 
         <section id="sectionPlay" class="d-none">
             <div class="d-flex justify-content-between">
-                <h2>Play&nbsp; <span class="badge rounded-pill bg-primary" id="bgPosition" ></span></h2>
+                <h2>Play&nbsp; <span class="badge rounded-pill bg-primary" id="bgPosition"></span></h2>
                 <div class="btn-group" role="group" aria-label="Basic example">
                     <button id="btnReset" type="button" class="btn btn-outline-success" onclick="reset()">
                         <span class="material-icons">
@@ -167,7 +167,7 @@
     -->
 </body>
 <script>
-    window.onerror = function(error, url, line) {
+    window.onerror = function (error, url, line) {
         alert(`ERR:${error} URL:${url} L:${line}`);
     };
     var voices = [];
@@ -216,35 +216,27 @@
     }
 
     function loadVoices() {
-        try {
-            voices = window.speechSynthesis.getVoices();
-            
-            if (voices.length>0){
-                alert(voices[0].name);
-            } else {
-                alert("No cargo");
-            }
-            
+        voices = window.speechSynthesis.getVoices();
+
+        if (voices.length > 0) {
+
+
             var option = "<option value='{{i}}'>{{text}}</option>";
             var str = "";
             for (let index = 0; index < voices.length; index++) {
                 const voice = voices[index];
-                str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "["+ voice.lang+"]")
-                // if (voice.lang == "en-US") {
-                    
-                //     str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "["+ voice.lang+"]")
-                // }
+                str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "[" + voice.lang + "]")
+                if (voice.lang == "en-US" || voice.lang == "en_US") {
+
+                    str += option.replace(/{{i}}/gi, index).replace(/{{text}}/gi, voice.name + "[" + voice.lang + "]")
+                }
             }
-            alert(str);
             document.getElementById("ddlVoice").innerHTML = str;
-            document.getElementById("ddlVoice").value = data.voice.value;   
-        } catch (e){
-            alert(e);
+            document.getElementById("ddlVoice").value = data.voice.value;
         }
-        
     }
 
-    window.speechSynthesis.onvoiceschanged = function(e) {
+    window.speechSynthesis.onvoiceschanged = function (e) {
         loadVoices();
     };
 
@@ -336,14 +328,14 @@
         const word = data.words[iteratedPositions[currentPosition]];
         if (word) {
             document.getElementById("currentWord").innerHTML = word;
-            document.getElementById("bgPosition").innerHTML = `${currentPosition+1}/${data.words.length}`;
+            document.getElementById("bgPosition").innerHTML = `${currentPosition + 1}/${data.words.length}`;
             if (data.game.teacher) {
                 removeClass("currentWord", "hidden-text");
             }
             else {
                 addClass("currentWord", "hidden-text");
             }
-             
+
             say(word);
             if (reset) {
                 resetInterval();
